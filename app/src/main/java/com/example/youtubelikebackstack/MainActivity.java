@@ -17,7 +17,6 @@ import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -25,7 +24,11 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    addFragment(getSupportFragmentManager(), new HomeFragment(), R.id.frame, true);
+                    if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                        addFragment(getSupportFragmentManager(), new HomeFragment(), R.id.frame, true);
+                    }else{
+                        getSupportFragmentManager().popBackStack();
+                    }
                     return true;
                 case R.id.navigation_dashboard:
                     addFragment(getSupportFragmentManager(), new DashboardFragment(), R.id.frame, false);
