@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         // hide everything
         for (Fragment fragment : fragmentManager.getFragments()) {
-            transaction.hide(fragment);
+            transaction.detach(fragment);
         }
 
         // Retrieve fragment instance, if it was already created
@@ -89,14 +89,14 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else { // otherwise just show it
-            transaction.show(fragment);
+            transaction.attach(fragment);
         }
-        transaction.commit();
+        transaction.commitNowAllowingStateLoss();
     }
 
     @Override
     public void onBackPressed() {
-        if (!getSupportFragmentManager().findFragmentByTag(Page.HOME.name()).isHidden()) {
+        if (!getSupportFragmentManager().findFragmentByTag(Page.HOME.name()).isDetached()) {
             super.onBackPressed();
         } else {
             navigation.setSelectedItemId(R.id.navigation_home);

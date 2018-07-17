@@ -9,17 +9,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class HomeFragment extends Fragment {
-    private final static String TAG = "HomeFragment";
-
+public class HomeFragment extends BaseFragment {
     public HomeFragment(){
-        Log.d(TAG, "Created");
+        TAG = "HomeFragment";
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.home_fragment, container, false);
-        Log.d(TAG, "onCreateView");
         return view;
     }
+
 }

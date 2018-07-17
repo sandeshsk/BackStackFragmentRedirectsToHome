@@ -9,17 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class DashboardFragment extends Fragment {
-    private final static String TAG = "DashboardFragment";
-    public DashboardFragment(){
-        Log.d(TAG, "Created");
+public class DashboardFragment extends BaseFragment {
+    public DashboardFragment() {
+        TAG = "DashboardFragment";
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.dashboard_fragment, container, false);
-        Log.d(TAG, "onCreateView");
-        return view;
+        super.onCreateView(inflater, container, savedInstanceState);
+        return inflater.inflate(R.layout.dashboard_fragment, container, false);
     }
 }
