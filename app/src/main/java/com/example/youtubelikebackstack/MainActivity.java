@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         } else { // otherwise just show it
             transaction.attach(fragment);
         }
-        transaction.commitNowAllowingStateLoss();
+        transaction.commit();
     }
 
     @Override
