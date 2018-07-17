@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 
 public class SettingFragment extends Fragment {
     private final static String TAG = "SettingFragment";
-
+    public SettingFragment(){
+        Log.d(TAG, "Created");
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

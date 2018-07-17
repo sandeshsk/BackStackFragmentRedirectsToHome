@@ -39,10 +39,7 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    if (getSupportFragmentManager().getBackStackEntryCount() == 0)
-                        setPage(Page.HOME);
-                    else
-                        getSupportFragmentManager().popBackStack();
+                    setPage(Page.HOME);
                     break;
                 case R.id.navigation_dashboard:
                     setPage(Page.DASHBOARD);
@@ -59,8 +56,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
-
-    private BottomNavigationView navigation;
+    BottomNavigationView navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,33 +70,36 @@ public class MainActivity extends AppCompatActivity {
 
     private void setPage(Page page) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        // pop everything except Home fragment
-        fragmentManager.popBackStack(Page.HOME.name(), 0);
-
         String tag = page.name();
+
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+        // hide everything
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            transaction.hide(fragment);
+        }
 
         // Retrieve fragment instance, if it was already created
         Fragment fragment = fragmentManager.findFragmentByTag(tag);
-        // If not, crate new instance
-        if (fragment == null) {
+        if (fragment == null) { // If not, crate new instance and add it
             try {
                 fragment = (Fragment) page.clazz.newInstance();
+                transaction.add(R.id.frame, fragment, tag);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+        } else { // otherwise just show it
+            transaction.show(fragment);
         }
-        fragmentManager.beginTransaction()
-                .replace(R.id.frame, fragment, tag)
-                .commit();
+        transaction.commit();
     }
-
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            navigation.setSelectedItemId(R.id.navigation_home);
-        } else {
+        if (!getSupportFragmentManager().findFragmentByTag(Page.HOME.name()).isHidden()) {
             super.onBackPressed();
+        } else {
+            navigation.setSelectedItemId(R.id.navigation_home);
         }
     }
 
