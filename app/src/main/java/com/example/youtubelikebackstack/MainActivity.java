@@ -84,9 +84,8 @@ public class MainActivity extends AppCompatActivity {
         // If not, crate new instance
         if (fragment == null) {
             try {
-                fragment = (Fragment) page.clazz.getConstructor().newInstance();
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                    NoSuchMethodException e) {
+                fragment = (Fragment) page.clazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
