@@ -3,6 +3,7 @@ package com.example.youtubelikebackstack;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.internal.BottomNavigationItemView;
 import android.support.design.internal.BottomNavigationMenuView;
 import android.support.design.widget.BottomNavigationView;
@@ -14,8 +15,22 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 public class MainActivity extends AppCompatActivity {
+
+    enum Page {
+        HOME(HomeFragment.class),
+        DASHBOARD(DashboardFragment.class),
+        NOTIFICATION(NotificationFragment.class),
+        SETTINGS(SettingFragment.class);
+
+        final public Class clazz;
+
+        Page(Class clazz) {
+            this.clazz = clazz;
+        }
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -24,26 +39,24 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                        addFragment(getSupportFragmentManager(), new HomeFragment(), R.id.frame, true);
-                    }else{
-                        getSupportFragmentManager().popBackStack();
-                    }
-                    return true;
+                    setPage(Page.HOME);
+                    break;
                 case R.id.navigation_dashboard:
-                    addFragment(getSupportFragmentManager(), new DashboardFragment(), R.id.frame, false);
-                    return true;
+                    setPage(Page.DASHBOARD);
+                    break;
                 case R.id.navigation_notifications:
-                    addFragment(getSupportFragmentManager(), new NotificationFragment(), R.id.frame, false);
-                    return true;
+                    setPage(Page.NOTIFICATION);
+                    break;
                 case R.id.navigation_setting:
-                    addFragment(getSupportFragmentManager(), new SettingFragment(), R.id.frame, false);
-                    return true;
+                    setPage(Page.SETTINGS);
+                    break;
+                default:
+                    return false;
             }
-            return false;
+            return true;
         }
     };
-    private BottomNavigationView navigation;
+    BottomNavigationView navigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,29 +68,38 @@ public class MainActivity extends AppCompatActivity {
         navigation.setSelectedItemId(R.id.navigation_home);
     }
 
-    public void addFragment(FragmentManager fragmentManager,
-                            Fragment fragment,
-                            int containerId, boolean isFromHome) {
+    private void setPage(Page page) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        String tag = page.name();
 
-        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        if (isFromHome) {
-            fragmentTransaction.replace(containerId, fragment);
-        } else {
-            fragmentTransaction.add(new HomeFragment(), "Home");
-            fragmentTransaction.addToBackStack("Home");
+        // hide everything
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            transaction.detach(fragment);
         }
-        fragmentTransaction.replace(containerId, fragment).commit();
 
+        // Retrieve fragment instance, if it was already created
+        Fragment fragment = fragmentManager.findFragmentByTag(tag);
+        if (fragment == null) { // If not, crate new instance and add it
+            try {
+                fragment = (Fragment) page.clazz.newInstance();
+                transaction.add(R.id.frame, fragment, tag);
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        } else { // otherwise just show it
+            transaction.attach(fragment);
+        }
+        transaction.commit();
     }
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            navigation.setSelectedItemId(R.id.navigation_home);
-        } else {
+        if (!getSupportFragmentManager().findFragmentByTag(Page.HOME.name()).isDetached()) {
             super.onBackPressed();
+        } else {
+            navigation.setSelectedItemId(R.id.navigation_home);
         }
     }
 
